@@ -27,8 +27,8 @@ jobs:
 
     - name: Start PHP server
       run: |
-        php -S 127.0.0.1:8000 api.php &
-        sleep 2
+        php -S 127.0.0.1:8000 -t . >/dev/null 2>&1 &
+        sleep 3
 
     - name: Run API tests
       run: php tests/test_api.php
