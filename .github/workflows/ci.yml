@@ -23,7 +23,7 @@ jobs:
     - name: Import database SQL
       run: |
         mysql -u root -proot -e "CREATE DATABASE kontak;"
-        mysql -u root -proot kontak < kontak(2).sql
+        mysql -u root -proot kontak < kontak.sql
 
     - name: Start PHP server
       run: |
