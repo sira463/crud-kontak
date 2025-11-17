@@ -3,8 +3,8 @@ header('Content-Type: application/json');
 
 define('DB_SERVER', '127.0.0.1');   // aman untuk CI &
 define('DB_USERNAME', 'root');      // tetap
-define('DB_PASSWORD', '');          // CI tidak pakai password
-define('DB_NAME', 'kontak');        // ini wajib ubah
+define('DB_PASSWORD', 'root');   // GitHub Actions pakai password root
+define('DB_NAME', 'kontak');     // GitHub Actions membuat database bernama kontak
 
 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 if ($conn->connect_error) {
@@ -113,4 +113,5 @@ switch($method){
 }
 $conn->close();
 ?>
+
 
