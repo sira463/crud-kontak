@@ -1,0 +1,57 @@
+name: CI - PHP API tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: db_kontak_sederhana
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=2s
+          --health-retries=10
+        ports:
+          - 3306:3306
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install mysql client
+      run: sudo apt-get update && sudo apt-get install -y default-mysql-client
+
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {1..30}; do
+          mysqladmin ping -h127.0.0.1 -uroot -proot >/dev/null 2>&1 && break
+          echo "waiting mysql..."
+          sleep 2
+        done
+
+    - name: Import database SQL
+      run: |
+        mysql -h127.0.0.1 -uroot -proot db_kontak_sederhana < "kontak(2).sql"
+
+    - name: Adapt api.php DB password
+      run: |
+        sed -i "s/define('DB_PASSWORD', '' );/define('DB_PASSWORD', 'root');/g" api.php || true
+        sed -i "s/define('DB_PASSWORD', ''\);/define('DB_PASSWORD', 'root');/g" api.php || true
+
+    - name: Start PHP server
+      run: |
+        php -S 127.0.0.1:8000 >/dev/null 2>&1 &
+        sleep 2
+
+    - name: Run API tests
+      run: |
+        php tests/test_api.php
